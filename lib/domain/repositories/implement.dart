@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter_application/domain/user_response.dart';
+import 'package:flutter_application/domain/model/users_respond/user_response.dart';
 import 'package:http/http.dart' as http;
 
 class UserRepository {

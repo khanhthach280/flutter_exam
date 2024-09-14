@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/domain/repositories/implement.dart';
-import 'package:flutter_application/domain/user_response.dart';
+import 'package:flutter_application/domain/model/users_respond/user_response.dart';
+import 'package:flutter_application/user_detail_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -58,22 +59,36 @@ class _MyHomePageState extends State<MyHomePage> {
               itemCount: users.length,
               itemBuilder: (context, index) {
                 final user = users[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(user.profile_image),
-                  ),
-                  title: Text(user.display_name),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Reputation: ${user.reputation}'),
-                      if (user.location != null && user.location!.isNotEmpty)
-                        Text('Location: ${user.location}'),
-                      // if (user.age != null)
-                      //   Text('Age: ${user.age}'),
-                       if (user.reputation_change_year != null)
-                        Text('Age: ${user.reputation_change_year}'),
-                    ],
+                return InkWell(
+                  onTap: () {
+                    print('khanh ============== ${user.user_id}');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UserDetailPage(
+                          userId: user.user_id,
+                          userName: user.display_name,
+                        ),
+                      ),
+                    );
+                  },
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(user.profile_image),
+                    ),
+                    title: Text(user.display_name),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Reputation: ${user.reputation}'),
+                        if (user.location != null && user.location!.isNotEmpty)
+                          Text('Location: ${user.location}'),
+                        // if (user.age != null)
+                        //   Text('Age: ${user.age}'),
+                        if (user.reputation_change_year != null)
+                          Text('Age: ${user.reputation_change_year}'),
+                      ],
+                    ),
                   ),
                 );
               },

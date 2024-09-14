@@ -1,4 +1,4 @@
-import 'package:flutter_application/domain/badge_counts.dart';
+import 'package:flutter_application/domain/model/users_respond/badge_counts.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'user.freezed.dart';
