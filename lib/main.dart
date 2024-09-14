@@ -33,11 +33,23 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late Future<UserResponse> _userResponse;
+  final List<int> _bookmarkedUsers = []; // Danh sách người dùng được đánh dấu
 
   @override
   void initState() {
     super.initState();
     _userResponse = UserRepository().fetchUsers();
+  }
+
+  // Hàm để đánh dấu hoặc bỏ đánh dấu người dùng
+  void _toggleBookmark(int userId) {
+    setState(() {
+      if (_bookmarkedUsers.contains(userId)) {
+        _bookmarkedUsers.remove(userId);
+      } else {
+        _bookmarkedUsers.add(userId);
+      }
+    });
   }
 
   @override
@@ -59,6 +71,8 @@ class _MyHomePageState extends State<MyHomePage> {
               itemCount: users.length,
               itemBuilder: (context, index) {
                 final user = users[index];
+                final isBookmarked = _bookmarkedUsers.contains(user.user_id); // Kiểm tra người dùng có được đánh dấu không
+
                 return InkWell(
                   onTap: () {
                     print('khanh ============== ${user.user_id}');
@@ -83,11 +97,18 @@ class _MyHomePageState extends State<MyHomePage> {
                         Text('Reputation: ${user.reputation}'),
                         if (user.location != null && user.location!.isNotEmpty)
                           Text('Location: ${user.location}'),
-                        // if (user.age != null)
-                        //   Text('Age: ${user.age}'),
                         if (user.reputation_change_year != null)
-                          Text('Age: ${user.reputation_change_year}'),
+                          Text('Reputation Change Year: ${user.reputation_change_year}'),
                       ],
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(
+                        isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                        color: isBookmarked ? Colors.blue : null,
+                      ),
+                      onPressed: () {
+                        _toggleBookmark(user.user_id); // Đánh dấu hoặc bỏ đánh dấu
+                      },
                     ),
                   ),
                 );
