@@ -1,3 +1,4 @@
+import 'dart:convert'; // Để mã hóa và giải mã JSON
 import 'package:flutter/material.dart';
 import 'package:flutter_application/domain/model/users_respond/user.dart';
 import 'package:flutter_application/domain/repositories/implement.dart';
@@ -15,19 +16,20 @@ class UserListPage extends StatefulWidget {
 
 class _UserListPageState extends State<UserListPage> {
   List<User> _users = [];
-  List<User> _bookmarkedUserObjects = []; // Danh sách các đối tượng user đã bookmark
-  List<int> _bookmarkedUsers = [];
+  List<User> _bookmarkedUserObjects =
+      []; // Danh sách các đối tượng user đã bookmark
   int _page = 1;
   bool _isLoading = false;
   bool _hasMore = true;
-  bool _showBookmarkedOnly = false; // Kiểm tra xem có hiển thị chỉ user đã bookmark không
+  bool _showBookmarkedOnly =
+      false; // Kiểm tra xem có hiển thị chỉ user đã bookmark không
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _loadBookmarks();
-    _loadUsers();
+    _loadBookmarks(); // Tải danh sách các user đã bookmark từ local storage
+    _loadUsers(); // Tải danh sách user từ API
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
@@ -43,6 +45,7 @@ class _UserListPageState extends State<UserListPage> {
     super.dispose();
   }
 
+  // Tải danh sách user từ API lần đầu tiên
   Future<void> _loadUsers() async {
     if (_isLoading) return;
     setState(() {
@@ -54,7 +57,6 @@ class _UserListPageState extends State<UserListPage> {
       setState(() {
         _users = response.items;
         _hasMore = response.has_more;
-        _bookmarkedUserObjects = _users.where((user) => _bookmarkedUsers.contains(user.user_id)).toList();
       });
     } catch (e) {
       debugPrint('Error loading users: $e');
@@ -65,6 +67,7 @@ class _UserListPageState extends State<UserListPage> {
     }
   }
 
+  // Tải thêm user khi cuộn đến cuối danh sách
   Future<void> _loadMoreUsers() async {
     if (_isLoading || !_hasMore) return;
 
@@ -80,7 +83,6 @@ class _UserListPageState extends State<UserListPage> {
         _users = List.from(_users)..addAll(response.items);
         _page++;
         _hasMore = response.has_more;
-        _bookmarkedUserObjects = _users.where((user) => _bookmarkedUsers.contains(user.user_id)).toList();
       });
     } catch (e) {
       debugPrint('Error loading more users: $e');
@@ -91,32 +93,60 @@ class _UserListPageState extends State<UserListPage> {
     }
   }
 
+  // Tải danh sách bookmarked từ SharedPreferences
   Future<void> _loadBookmarks() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _bookmarkedUsers = prefs
-              .getStringList('bookmarkedUsers')
-              ?.map((e) => int.parse(e))
-              .toList() ??
-          [];
+    List<String>? bookmarkedUsersJson = prefs.getStringList('bookmarkedUsers');
+    if (bookmarkedUsersJson != null) {
+      setState(() {
+        _bookmarkedUserObjects = bookmarkedUsersJson.map((userJson) {
+          return userFromJson(userJson); // Chuyển JSON sang đối tượng User
+        }).toList();
+      });
+    }
+  }
+
+  // Lưu danh sách bookmarked vào SharedPreferences
+  Future<void> _saveBookmarks() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> bookmarkedUsersJson = _bookmarkedUserObjects.map((user) {
+      return userToJson(user); // Chuyển đối tượng User sang JSON
+    }).toList();
+    prefs.setStringList('bookmarkedUsers', bookmarkedUsersJson);
+  }
+
+  // Chuyển đối tượng User thành chuỗi JSON
+  String userToJson(User user) {
+    return json.encode({
+      'user_id': user.user_id,
+      'display_name': user.display_name,
+      'profile_image': user.profile_image,
+      'reputation': user.reputation,
+      'location': user.location ?? '',
     });
   }
 
-  Future<void> _saveBookmarks() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(
-        'bookmarkedUsers', _bookmarkedUsers.map((e) => e.toString()).toList());
+  // Chuyển chuỗi JSON thành đối tượng User
+  User userFromJson(String jsonString) {
+    final jsonData = json.decode(jsonString);
+    return User(
+      user_id: jsonData['user_id'],
+      display_name: jsonData['display_name'],
+      profile_image: jsonData['profile_image'],
+      reputation: jsonData['reputation'],
+      location: jsonData['location'],
+    );
   }
 
-  void _toggleBookmark(int userId) {
+  // Thêm hoặc xóa user khỏi danh sách bookmark
+  void _toggleBookmark(User user) {
     setState(() {
-      if (_bookmarkedUsers.contains(userId)) {
-        _bookmarkedUsers.remove(userId);
+      if (_bookmarkedUserObjects.any((u) => u.user_id == user.user_id)) {
+        _bookmarkedUserObjects.removeWhere((u) => u.user_id == user.user_id);
       } else {
-        _bookmarkedUsers.add(userId);
+        _bookmarkedUserObjects.add(user);
       }
-      _bookmarkedUserObjects = _users.where((user) => _bookmarkedUsers.contains(user.user_id)).toList();
-      _saveBookmarks();
+      _saveBookmarks(); // Lưu lại danh sách bookmarked vào local storage
     });
   }
 
@@ -134,7 +164,8 @@ class _UserListPageState extends State<UserListPage> {
         title: const Text('StackOverflow Users'),
         actions: [
           IconButton(
-            icon: Icon(_showBookmarkedOnly ? Icons.bookmark : Icons.bookmark_border),
+            icon: Icon(
+                _showBookmarkedOnly ? Icons.bookmark : Icons.bookmark_border),
             onPressed: _toggleBookmarkView, // Chuyển chế độ xem
           ),
         ],
@@ -142,18 +173,24 @@ class _UserListPageState extends State<UserListPage> {
       body: Column(
         children: [
           Expanded(
-            child: _users.isEmpty
+            child: (_users.isEmpty && !_showBookmarkedOnly)
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
                     controller: _scrollController,
-                    itemCount: (_showBookmarkedOnly ? _bookmarkedUserObjects : _users).length + (_hasMore && !_showBookmarkedOnly ? 1 : 0),
+                    itemCount:
+                        (_showBookmarkedOnly ? _bookmarkedUserObjects : _users)
+                            .length + (_hasMore && !_showBookmarkedOnly ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (!_showBookmarkedOnly && index == _users.length) {
                         return const Center(child: CircularProgressIndicator());
                       }
+                      final user = _showBookmarkedOnly
+                          ? _bookmarkedUserObjects[index]
+                          : _users[index];
 
-                      final user = _showBookmarkedOnly ? _bookmarkedUserObjects[index] : _users[index];
-                      final isBookmarked = _bookmarkedUsers.contains(user.user_id);
+                      final isBookmarked = _bookmarkedUserObjects.any(
+                          (bookmarkedUser) =>
+                              bookmarkedUser.user_id == user.user_id);
 
                       return InkWell(
                         onTap: () {
@@ -176,17 +213,21 @@ class _UserListPageState extends State<UserListPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Reputation: ${user.reputation}'),
-                              if (user.location != null && user.location!.isNotEmpty)
+                              if (user.location != null &&
+                                  user.location!.isNotEmpty)
                                 Text('Location: ${user.location}'),
                             ],
                           ),
                           trailing: IconButton(
                             icon: Icon(
-                              isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                              isBookmarked
+                                  ? Icons.bookmark
+                                  : Icons.bookmark_border,
                               color: isBookmarked ? Colors.blue : null,
                             ),
                             onPressed: () {
-                              _toggleBookmark(user.user_id);
+                              _toggleBookmark(
+                                  user); // Truyền toàn bộ đối tượng user vào hàm
                             },
                           ),
                         ),
