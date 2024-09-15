@@ -7,28 +7,30 @@ part of 'user.dart';
 // **************************************************************************
 
 _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
-      badge_counts:
-          BadgeCounts.fromJson(json['badge_counts'] as Map<String, dynamic>),
-      account_id: (json['account_id'] as num).toInt(),
-      is_employee: json['is_employee'] as bool,
-      last_modified_date: (json['last_modified_date'] as num).toInt(),
-      last_access_date: (json['last_access_date'] as num).toInt(),
-      reputation_change_year: (json['reputation_change_year'] as num).toInt(),
+      badge_counts: json['badge_counts'] == null
+          ? null
+          : BadgeCounts.fromJson(json['badge_counts'] as Map<String, dynamic>),
+      account_id: (json['account_id'] as num?)?.toInt() ?? 0,
+      is_employee: json['is_employee'] as bool? ?? false,
+      last_modified_date: (json['last_modified_date'] as num?)?.toInt(),
+      last_access_date: (json['last_access_date'] as num?)?.toInt(),
+      reputation_change_year: (json['reputation_change_year'] as num?)?.toInt(),
       reputation_change_quarter:
-          (json['reputation_change_quarter'] as num).toInt(),
-      reputation_change_month: (json['reputation_change_month'] as num).toInt(),
-      reputation_change_week: (json['reputation_change_week'] as num).toInt(),
-      reputation_change_day: (json['reputation_change_day'] as num).toInt(),
-      reputation: (json['reputation'] as num).toInt(),
-      creation_date: (json['creation_date'] as num).toInt(),
-      user_type: json['user_type'] as String,
-      user_id: (json['user_id'] as num).toInt(),
+          (json['reputation_change_quarter'] as num?)?.toInt(),
+      reputation_change_month:
+          (json['reputation_change_month'] as num?)?.toInt(),
+      reputation_change_week: (json['reputation_change_week'] as num?)?.toInt(),
+      reputation_change_day: (json['reputation_change_day'] as num?)?.toInt(),
+      reputation: (json['reputation'] as num?)?.toInt(),
+      creation_date: (json['creation_date'] as num?)?.toInt(),
+      user_type: json['user_type'] as String?,
+      user_id: (json['user_id'] as num?)?.toInt() ?? 0,
       accept_rate: (json['accept_rate'] as num?)?.toInt(),
       location: json['location'] as String?,
       website_url: json['website_url'] as String?,
-      link: json['link'] as String,
-      profile_image: json['profile_image'] as String,
-      display_name: json['display_name'] as String,
+      link: json['link'] as String?,
+      profile_image: json['profile_image'] as String? ?? '',
+      display_name: json['display_name'] as String? ?? '',
     );
 
 Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>

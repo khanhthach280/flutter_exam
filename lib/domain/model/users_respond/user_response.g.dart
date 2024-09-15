@@ -8,12 +8,13 @@ part of 'user_response.dart';
 
 _$UserResponseImpl _$$UserResponseImplFromJson(Map<String, dynamic> json) =>
     _$UserResponseImpl(
-      items: (json['items'] as List<dynamic>)
-          .map((e) => User.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      has_more: json['has_more'] as bool,
-      quota_max: (json['quota_max'] as num).toInt(),
-      quota_remaining: (json['quota_remaining'] as num).toInt(),
+      items: (json['items'] as List<dynamic>?)
+              ?.map((e) => User.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      has_more: json['has_more'] as bool? ?? false,
+      quota_max: (json['quota_max'] as num?)?.toInt() ?? 0,
+      quota_remaining: (json['quota_remaining'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$$UserResponseImplToJson(_$UserResponseImpl instance) =>

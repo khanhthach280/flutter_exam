@@ -9,11 +9,11 @@ part of 'reputation_history.dart';
 _$ReputationHistoryImpl _$$ReputationHistoryImplFromJson(
         Map<String, dynamic> json) =>
     _$ReputationHistoryImpl(
-      reputation_history_type: json['reputation_history_type'] as String,
-      reputation_change: (json['reputation_change'] as num).toInt(),
-      post_id: (json['post_id'] as num).toInt(),
-      creation_date: (json['creation_date'] as num).toInt(),
-      user_id: (json['user_id'] as num).toInt(),
+      reputation_history_type: json['reputation_history_type'] as String? ?? '',
+      reputation_change: (json['reputation_change'] as num?)?.toInt(),
+      post_id: (json['post_id'] as num?)?.toInt() ?? 0,
+      creation_date: (json['creation_date'] as num?)?.toInt() ?? 0,
+      user_id: (json['user_id'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$$ReputationHistoryImplToJson(

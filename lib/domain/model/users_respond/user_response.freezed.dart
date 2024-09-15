@@ -133,10 +133,10 @@ class __$$UserResponseImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$UserResponseImpl implements _UserResponse {
   const _$UserResponseImpl(
-      {required final List<User> items,
-      required this.has_more,
-      required this.quota_max,
-      required this.quota_remaining})
+      {final List<User> items = const [],
+      this.has_more = false,
+      this.quota_max = 0,
+      this.quota_remaining = 0})
       : _items = items;
 
   factory _$UserResponseImpl.fromJson(Map<String, dynamic> json) =>
@@ -144,6 +144,7 @@ class _$UserResponseImpl implements _UserResponse {
 
   final List<User> _items;
   @override
+  @JsonKey()
   List<User> get items {
     if (_items is EqualUnmodifiableListView) return _items;
     // ignore: implicit_dynamic_type
@@ -151,10 +152,13 @@ class _$UserResponseImpl implements _UserResponse {
   }
 
   @override
+  @JsonKey()
   final bool has_more;
   @override
+  @JsonKey()
   final int quota_max;
   @override
+  @JsonKey()
   final int quota_remaining;
 
   @override
@@ -201,10 +205,10 @@ class _$UserResponseImpl implements _UserResponse {
 
 abstract class _UserResponse implements UserResponse {
   const factory _UserResponse(
-      {required final List<User> items,
-      required final bool has_more,
-      required final int quota_max,
-      required final int quota_remaining}) = _$UserResponseImpl;
+      {final List<User> items,
+      final bool has_more,
+      final int quota_max,
+      final int quota_remaining}) = _$UserResponseImpl;
 
   factory _UserResponse.fromJson(Map<String, dynamic> json) =
       _$UserResponseImpl.fromJson;

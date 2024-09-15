@@ -7,10 +7,10 @@ part 'user_response.g.dart';
 @freezed
 class UserResponse with _$UserResponse {
   const factory UserResponse({
-    required List<User> items,
-    required bool has_more,
-    required int quota_max,
-    required int quota_remaining,
+    @Default([]) List<User> items,
+    @Default(false) bool has_more,
+    @Default(0) int quota_max,
+    @Default(0) int quota_remaining,
   }) = _UserResponse;
 
   factory UserResponse.fromJson(Map<String, dynamic> json) =>

@@ -6,9 +6,9 @@ part 'badge_counts.g.dart';
 @freezed
 class BadgeCounts with _$BadgeCounts {
   const factory BadgeCounts({
-    required int bronze,
-    required int silver,
-    required int gold,
+    int? bronze,
+    int? silver,
+    int? gold,
   }) = _BadgeCounts;
 
   factory BadgeCounts.fromJson(Map<String, dynamic> json) =>

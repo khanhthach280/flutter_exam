@@ -20,9 +20,9 @@ BadgeCounts _$BadgeCountsFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$BadgeCounts {
-  int get bronze => throw _privateConstructorUsedError;
-  int get silver => throw _privateConstructorUsedError;
-  int get gold => throw _privateConstructorUsedError;
+  int? get bronze => throw _privateConstructorUsedError;
+  int? get silver => throw _privateConstructorUsedError;
+  int? get gold => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -36,7 +36,7 @@ abstract class $BadgeCountsCopyWith<$Res> {
           BadgeCounts value, $Res Function(BadgeCounts) then) =
       _$BadgeCountsCopyWithImpl<$Res, BadgeCounts>;
   @useResult
-  $Res call({int bronze, int silver, int gold});
+  $Res call({int? bronze, int? silver, int? gold});
 }
 
 /// @nodoc
@@ -52,23 +52,23 @@ class _$BadgeCountsCopyWithImpl<$Res, $Val extends BadgeCounts>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? bronze = null,
-    Object? silver = null,
-    Object? gold = null,
+    Object? bronze = freezed,
+    Object? silver = freezed,
+    Object? gold = freezed,
   }) {
     return _then(_value.copyWith(
-      bronze: null == bronze
+      bronze: freezed == bronze
           ? _value.bronze
           : bronze // ignore: cast_nullable_to_non_nullable
-              as int,
-      silver: null == silver
+              as int?,
+      silver: freezed == silver
           ? _value.silver
           : silver // ignore: cast_nullable_to_non_nullable
-              as int,
-      gold: null == gold
+              as int?,
+      gold: freezed == gold
           ? _value.gold
           : gold // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ) as $Val);
   }
 }
@@ -81,7 +81,7 @@ abstract class _$$BadgeCountsImplCopyWith<$Res>
       __$$BadgeCountsImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int bronze, int silver, int gold});
+  $Res call({int? bronze, int? silver, int? gold});
 }
 
 /// @nodoc
@@ -95,23 +95,23 @@ class __$$BadgeCountsImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? bronze = null,
-    Object? silver = null,
-    Object? gold = null,
+    Object? bronze = freezed,
+    Object? silver = freezed,
+    Object? gold = freezed,
   }) {
     return _then(_$BadgeCountsImpl(
-      bronze: null == bronze
+      bronze: freezed == bronze
           ? _value.bronze
           : bronze // ignore: cast_nullable_to_non_nullable
-              as int,
-      silver: null == silver
+              as int?,
+      silver: freezed == silver
           ? _value.silver
           : silver // ignore: cast_nullable_to_non_nullable
-              as int,
-      gold: null == gold
+              as int?,
+      gold: freezed == gold
           ? _value.gold
           : gold // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ));
   }
 }
@@ -119,18 +119,17 @@ class __$$BadgeCountsImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$BadgeCountsImpl implements _BadgeCounts {
-  const _$BadgeCountsImpl(
-      {required this.bronze, required this.silver, required this.gold});
+  const _$BadgeCountsImpl({this.bronze, this.silver, this.gold});
 
   factory _$BadgeCountsImpl.fromJson(Map<String, dynamic> json) =>
       _$$BadgeCountsImplFromJson(json);
 
   @override
-  final int bronze;
+  final int? bronze;
   @override
-  final int silver;
+  final int? silver;
   @override
-  final int gold;
+  final int? gold;
 
   @override
   String toString() {
@@ -167,19 +166,19 @@ class _$BadgeCountsImpl implements _BadgeCounts {
 
 abstract class _BadgeCounts implements BadgeCounts {
   const factory _BadgeCounts(
-      {required final int bronze,
-      required final int silver,
-      required final int gold}) = _$BadgeCountsImpl;
+      {final int? bronze,
+      final int? silver,
+      final int? gold}) = _$BadgeCountsImpl;
 
   factory _BadgeCounts.fromJson(Map<String, dynamic> json) =
       _$BadgeCountsImpl.fromJson;
 
   @override
-  int get bronze;
+  int? get bronze;
   @override
-  int get silver;
+  int? get silver;
   @override
-  int get gold;
+  int? get gold;
   @override
   @JsonKey(ignore: true)
   _$$BadgeCountsImplCopyWith<_$BadgeCountsImpl> get copyWith =>

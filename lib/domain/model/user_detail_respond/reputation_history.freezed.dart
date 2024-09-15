@@ -21,7 +21,7 @@ ReputationHistory _$ReputationHistoryFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$ReputationHistory {
   String get reputation_history_type => throw _privateConstructorUsedError;
-  int get reputation_change => throw _privateConstructorUsedError;
+  int? get reputation_change => throw _privateConstructorUsedError;
   int get post_id => throw _privateConstructorUsedError;
   int get creation_date => throw _privateConstructorUsedError;
   int get user_id => throw _privateConstructorUsedError;
@@ -40,7 +40,7 @@ abstract class $ReputationHistoryCopyWith<$Res> {
   @useResult
   $Res call(
       {String reputation_history_type,
-      int reputation_change,
+      int? reputation_change,
       int post_id,
       int creation_date,
       int user_id});
@@ -60,7 +60,7 @@ class _$ReputationHistoryCopyWithImpl<$Res, $Val extends ReputationHistory>
   @override
   $Res call({
     Object? reputation_history_type = null,
-    Object? reputation_change = null,
+    Object? reputation_change = freezed,
     Object? post_id = null,
     Object? creation_date = null,
     Object? user_id = null,
@@ -70,10 +70,10 @@ class _$ReputationHistoryCopyWithImpl<$Res, $Val extends ReputationHistory>
           ? _value.reputation_history_type
           : reputation_history_type // ignore: cast_nullable_to_non_nullable
               as String,
-      reputation_change: null == reputation_change
+      reputation_change: freezed == reputation_change
           ? _value.reputation_change
           : reputation_change // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       post_id: null == post_id
           ? _value.post_id
           : post_id // ignore: cast_nullable_to_non_nullable
@@ -100,7 +100,7 @@ abstract class _$$ReputationHistoryImplCopyWith<$Res>
   @useResult
   $Res call(
       {String reputation_history_type,
-      int reputation_change,
+      int? reputation_change,
       int post_id,
       int creation_date,
       int user_id});
@@ -118,7 +118,7 @@ class __$$ReputationHistoryImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? reputation_history_type = null,
-    Object? reputation_change = null,
+    Object? reputation_change = freezed,
     Object? post_id = null,
     Object? creation_date = null,
     Object? user_id = null,
@@ -128,10 +128,10 @@ class __$$ReputationHistoryImplCopyWithImpl<$Res>
           ? _value.reputation_history_type
           : reputation_history_type // ignore: cast_nullable_to_non_nullable
               as String,
-      reputation_change: null == reputation_change
+      reputation_change: freezed == reputation_change
           ? _value.reputation_change
           : reputation_change // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       post_id: null == post_id
           ? _value.post_id
           : post_id // ignore: cast_nullable_to_non_nullable
@@ -152,24 +152,28 @@ class __$$ReputationHistoryImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ReputationHistoryImpl implements _ReputationHistory {
   const _$ReputationHistoryImpl(
-      {required this.reputation_history_type,
-      required this.reputation_change,
-      required this.post_id,
-      required this.creation_date,
-      required this.user_id});
+      {this.reputation_history_type = '',
+      this.reputation_change,
+      this.post_id = 0,
+      this.creation_date = 0,
+      this.user_id = 0});
 
   factory _$ReputationHistoryImpl.fromJson(Map<String, dynamic> json) =>
       _$$ReputationHistoryImplFromJson(json);
 
   @override
+  @JsonKey()
   final String reputation_history_type;
   @override
-  final int reputation_change;
+  final int? reputation_change;
   @override
+  @JsonKey()
   final int post_id;
   @override
+  @JsonKey()
   final int creation_date;
   @override
+  @JsonKey()
   final int user_id;
 
   @override
@@ -215,11 +219,11 @@ class _$ReputationHistoryImpl implements _ReputationHistory {
 
 abstract class _ReputationHistory implements ReputationHistory {
   const factory _ReputationHistory(
-      {required final String reputation_history_type,
-      required final int reputation_change,
-      required final int post_id,
-      required final int creation_date,
-      required final int user_id}) = _$ReputationHistoryImpl;
+      {final String reputation_history_type,
+      final int? reputation_change,
+      final int post_id,
+      final int creation_date,
+      final int user_id}) = _$ReputationHistoryImpl;
 
   factory _ReputationHistory.fromJson(Map<String, dynamic> json) =
       _$ReputationHistoryImpl.fromJson;
@@ -227,7 +231,7 @@ abstract class _ReputationHistory implements ReputationHistory {
   @override
   String get reputation_history_type;
   @override
-  int get reputation_change;
+  int? get reputation_change;
   @override
   int get post_id;
   @override

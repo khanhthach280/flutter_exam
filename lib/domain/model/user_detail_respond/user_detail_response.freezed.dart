@@ -139,10 +139,10 @@ class __$$UserDetailResponseImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$UserDetailResponseImpl implements _UserDetailResponse {
   const _$UserDetailResponseImpl(
-      {required final List<ReputationHistory> items,
-      required this.has_more,
-      required this.quota_max,
-      required this.quota_remaining})
+      {final List<ReputationHistory> items = const [],
+      this.has_more = false,
+      this.quota_max = 0,
+      this.quota_remaining = 0})
       : _items = items;
 
   factory _$UserDetailResponseImpl.fromJson(Map<String, dynamic> json) =>
@@ -150,6 +150,7 @@ class _$UserDetailResponseImpl implements _UserDetailResponse {
 
   final List<ReputationHistory> _items;
   @override
+  @JsonKey()
   List<ReputationHistory> get items {
     if (_items is EqualUnmodifiableListView) return _items;
     // ignore: implicit_dynamic_type
@@ -157,10 +158,13 @@ class _$UserDetailResponseImpl implements _UserDetailResponse {
   }
 
   @override
+  @JsonKey()
   final bool has_more;
   @override
+  @JsonKey()
   final int quota_max;
   @override
+  @JsonKey()
   final int quota_remaining;
 
   @override
@@ -208,10 +212,10 @@ class _$UserDetailResponseImpl implements _UserDetailResponse {
 
 abstract class _UserDetailResponse implements UserDetailResponse {
   const factory _UserDetailResponse(
-      {required final List<ReputationHistory> items,
-      required final bool has_more,
-      required final int quota_max,
-      required final int quota_remaining}) = _$UserDetailResponseImpl;
+      {final List<ReputationHistory> items,
+      final bool has_more,
+      final int quota_max,
+      final int quota_remaining}) = _$UserDetailResponseImpl;
 
   factory _UserDetailResponse.fromJson(Map<String, dynamic> json) =
       _$UserDetailResponseImpl.fromJson;

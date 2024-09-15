@@ -7,10 +7,10 @@ part 'user_detail_response.g.dart';
 @freezed
 class UserDetailResponse with _$UserDetailResponse {
   const factory UserDetailResponse({
-    required List<ReputationHistory> items,
-    required bool has_more,
-    required int quota_max,
-    required int quota_remaining,
+    @Default([]) List<ReputationHistory> items,
+    @Default(false) bool has_more,
+    @Default(0) int quota_max,
+    @Default(0) int quota_remaining,
   }) = _UserDetailResponse;
 
   factory UserDetailResponse.fromJson(Map<String, dynamic> json) => _$UserDetailResponseFromJson(json);

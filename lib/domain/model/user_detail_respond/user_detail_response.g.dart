@@ -9,12 +9,14 @@ part of 'user_detail_response.dart';
 _$UserDetailResponseImpl _$$UserDetailResponseImplFromJson(
         Map<String, dynamic> json) =>
     _$UserDetailResponseImpl(
-      items: (json['items'] as List<dynamic>)
-          .map((e) => ReputationHistory.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      has_more: json['has_more'] as bool,
-      quota_max: (json['quota_max'] as num).toInt(),
-      quota_remaining: (json['quota_remaining'] as num).toInt(),
+      items: (json['items'] as List<dynamic>?)
+              ?.map(
+                  (e) => ReputationHistory.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      has_more: json['has_more'] as bool? ?? false,
+      quota_max: (json['quota_max'] as num?)?.toInt() ?? 0,
+      quota_remaining: (json['quota_remaining'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$$UserDetailResponseImplToJson(
