@@ -35,10 +35,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<User> _users = [];
+  List<User> _bookmarkedUserObjects = []; // Danh sách các đối tượng user đã bookmark
   List<int> _bookmarkedUsers = [];
   int _page = 1;
   bool _isLoading = false;
   bool _hasMore = true;
+  bool _showBookmarkedOnly = false; // Kiểm tra xem có hiển thị chỉ user đã bookmark không
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -72,6 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         _users = response.items;
         _hasMore = response.has_more;
+        _bookmarkedUserObjects = _users.where((user) => _bookmarkedUsers.contains(user.user_id)).toList();
       });
     } catch (e) {
       debugPrint('Error loading users: $e');
@@ -97,6 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _users = List.from(_users)..addAll(response.items);
         _page++;
         _hasMore = response.has_more;
+        _bookmarkedUserObjects = _users.where((user) => _bookmarkedUsers.contains(user.user_id)).toList();
       });
     } catch (e) {
       debugPrint('Error loading more users: $e');
@@ -123,6 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
     prefs.setStringList(
         'bookmarkedUsers', _bookmarkedUsers.map((e) => e.toString()).toList());
   }
+
   void _toggleBookmark(int userId) {
     setState(() {
       if (_bookmarkedUsers.contains(userId)) {
@@ -130,7 +135,15 @@ class _MyHomePageState extends State<MyHomePage> {
       } else {
         _bookmarkedUsers.add(userId);
       }
+      _bookmarkedUserObjects = _users.where((user) => _bookmarkedUsers.contains(user.user_id)).toList();
       _saveBookmarks();
+    });
+  }
+
+  // Hàm chuyển đổi giữa chế độ hiển thị bookmark và all users
+  void _toggleBookmarkView() {
+    setState(() {
+      _showBookmarkedOnly = !_showBookmarkedOnly;
     });
   }
 
@@ -139,59 +152,67 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('StackOverflow Users'),
+        actions: [
+          IconButton(
+            icon: Icon(_showBookmarkedOnly ? Icons.bookmark : Icons.bookmark_border),
+            onPressed: _toggleBookmarkView, // Chuyển chế độ xem
+          ),
+        ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: _users.isEmpty ? const Center(child: CircularProgressIndicator()) : ListView.builder(
-              controller: _scrollController,
-              itemCount: _users.length + (_hasMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == _users.length) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+            child: _users.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    controller: _scrollController,
+                    itemCount: (_showBookmarkedOnly ? _bookmarkedUserObjects : _users).length + (_hasMore && !_showBookmarkedOnly ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (!_showBookmarkedOnly && index == _users.length) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                final user = _users[index];
-                final isBookmarked = _bookmarkedUsers.contains(user.user_id);
+                      final user = _showBookmarkedOnly ? _bookmarkedUserObjects[index] : _users[index];
+                      final isBookmarked = _bookmarkedUsers.contains(user.user_id);
 
-                return InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => UserDetailPage(
-                          userId: user.user_id,
-                          userName: user.display_name,
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UserDetailPage(
+                                userId: user.user_id,
+                                userName: user.display_name,
+                              ),
+                            ),
+                          );
+                        },
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(user.profile_image),
+                          ),
+                          title: Text(user.display_name),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Reputation: ${user.reputation}'),
+                              if (user.location != null && user.location!.isNotEmpty)
+                                Text('Location: ${user.location}'),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(
+                              isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                              color: isBookmarked ? Colors.blue : null,
+                            ),
+                            onPressed: () {
+                              _toggleBookmark(user.user_id);
+                            },
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: NetworkImage(user.profile_image),
-                    ),
-                    title: Text(user.display_name),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Reputation: ${user.reputation}'),
-                        if (user.location != null && user.location!.isNotEmpty)
-                          Text('Location: ${user.location}'),
-                      ],
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(
-                        isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                        color: isBookmarked ? Colors.blue : null,
-                      ),
-                      onPressed: () {
-                        _toggleBookmark(user.user_id);
-                      },
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),
