@@ -74,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _hasMore = response.has_more;
       });
     } catch (e) {
-      print('Error loading users: $e');
+      debugPrint('Error loading users: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -93,17 +93,13 @@ class _MyHomePageState extends State<MyHomePage> {
       final response =
           await UserRepository().fetchUsers(page: _page + 1, pageSize: 15);
 
-      print(_users);
-
-      print(response.items);
-
       setState(() {
         _users = List.from(_users)..addAll(response.items);
         _page++;
         _hasMore = response.has_more;
       });
     } catch (e) {
-      print('Error loading more users: $e');
+      debugPrint('Error loading more users: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -147,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
+            child: _users.isEmpty ? const Center(child: CircularProgressIndicator()) : ListView.builder(
               controller: _scrollController,
               itemCount: _users.length + (_hasMore ? 1 : 0),
               itemBuilder: (context, index) {
@@ -160,7 +156,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
                 return InkWell(
                   onTap: () {
-                    print('khanh ============== ${user.user_id}');
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -198,10 +193,6 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
           ),
-          if (_isLoading && _users.isEmpty)
-            const Center(
-              child: CircularProgressIndicator(),
-            ),
         ],
       ),
     );

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/domain/model/user_detail_respond/reputation_history.dart';
-import 'package:flutter_application/domain/model/user_detail_respond/user_detail_response.dart';
 import 'package:flutter_application/domain/repositories/implement.dart';
 import 'package:intl/intl.dart';
 
@@ -8,10 +7,10 @@ class UserDetailPage extends StatefulWidget {
   final int userId;
   final String? userName;
 
-  const UserDetailPage({Key? key, required this.userId, this.userName})
-      : super(key: key);
+  const UserDetailPage({super.key, required this.userId, this.userName});
 
   @override
+  // ignore: library_private_types_in_public_api
   _UserDetailPageState createState() => _UserDetailPageState();
 }
 
@@ -28,7 +27,8 @@ class _UserDetailPageState extends State<UserDetailPage> {
     _loadReputationHistory(); // Tải lịch sử danh tiếng lần đầu tiên
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent && _hasMore) {
+              _scrollController.position.maxScrollExtent &&
+          _hasMore) {
         _loadMoreReputationHistory(); // Tải thêm khi cuộn đến cuối danh sách
       }
     });
@@ -62,7 +62,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
         _hasMore = response.has_more; // Kiểm tra có còn dữ liệu để tải không
       });
     } catch (e) {
-      print('Error loading reputation history: $e');
+      debugPrint('Error loading reputation history: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -85,14 +85,13 @@ class _UserDetailPageState extends State<UserDetailPage> {
         pageSize: 10,
       );
       setState(() {
-        // _reputationHistory.addAll(response.items); // Thêm dữ liệu mới/
-
-        _reputationHistory = List.from(_reputationHistory)..addAll(response.items);
+        _reputationHistory = List.from(_reputationHistory)
+          ..addAll(response.items);
         _page++;
         _hasMore = response.has_more;
       });
     } catch (e) {
-      print('Error loading more reputation history: $e');
+      debugPrint('Error loading more reputation history: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -109,39 +108,43 @@ class _UserDetailPageState extends State<UserDetailPage> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: _reputationHistory.length + (_hasMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == _reputationHistory.length) {
-                  return const Center(
+            child: _reputationHistory.isEmpty
+                ? const Center(
                     child: Padding(
                       padding: EdgeInsets.all(8.0),
                       child: CircularProgressIndicator(),
                     ),
-                  );
-                }
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    itemCount: _reputationHistory.length + (_hasMore ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == _reputationHistory.length) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
 
-                final reputation = _reputationHistory[index];
-                return ListTile(
-                  leading: const Icon(Icons.star, color: Colors.blue),
-                  title: Text('Change: ${reputation.reputation_change}'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Type: ${reputation.reputation_history_type}'),
-                      Text('Created At: ${formatDate(reputation.creation_date)}'),
-                    ],
+                      final reputation = _reputationHistory[index];
+                      return ListTile(
+                        leading: const Icon(Icons.star, color: Colors.blue),
+                        title: Text('Change: ${reputation.reputation_change}'),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Type: ${reputation.reputation_history_type}'),
+                            Text(
+                                'Created At: ${formatDate(reputation.creation_date)}'),
+                          ],
+                        ),
+                        trailing: Text('Post ID: ${reputation.post_id}'),
+                      );
+                    },
                   ),
-                  trailing: Text('Post ID: ${reputation.post_id}'),
-                );
-              },
-            ),
           ),
-          if (_isLoading && _reputationHistory.isEmpty)
-            const Center(
-              child: CircularProgressIndicator(),
-            ),
         ],
       ),
     );
