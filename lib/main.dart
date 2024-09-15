@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/domain/model/users_respond/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_application/domain/repositories/implement.dart';
-import 'package:flutter_application/domain/model/users_respond/user_response.dart';
 import 'package:flutter_application/user_detail_page.dart';
 
 void main() {
@@ -9,6 +10,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -32,16 +34,99 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late Future<UserResponse> _userResponse;
-  final List<int> _bookmarkedUsers = []; // Danh sách người dùng được đánh dấu
+  List<User> _users = [];
+  List<int> _bookmarkedUsers = [];
+  int _page = 1;
+  bool _isLoading = false;
+  bool _hasMore = true;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _userResponse = UserRepository().fetchUsers();
+    _loadBookmarks();
+    _loadUsers();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+              _scrollController.position.maxScrollExtent &&
+          _hasMore) {
+        _loadMoreUsers();
+      }
+    });
   }
 
-  // Hàm để đánh dấu hoặc bỏ đánh dấu người dùng
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadUsers() async {
+    if (_isLoading) return;
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final response =
+          await UserRepository().fetchUsers(page: _page, pageSize: 10);
+      setState(() {
+        _users = response.items;
+        _hasMore = response.has_more;
+      });
+    } catch (e) {
+      print('Error loading users: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadMoreUsers() async {
+    if (_isLoading || !_hasMore) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response =
+          await UserRepository().fetchUsers(page: _page + 1, pageSize: 15);
+
+      print(_users);
+
+      print(response.items);
+
+      setState(() {
+        _users = List.from(_users)..addAll(response.items);
+        _page++;
+        _hasMore = response.has_more;
+      });
+    } catch (e) {
+      print('Error loading more users: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadBookmarks() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _bookmarkedUsers = prefs
+              .getStringList('bookmarkedUsers')
+              ?.map((e) => int.parse(e))
+              .toList() ??
+          [];
+    });
+  }
+
+  Future<void> _saveBookmarks() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(
+        'bookmarkedUsers', _bookmarkedUsers.map((e) => e.toString()).toList());
+  }
   void _toggleBookmark(int userId) {
     setState(() {
       if (_bookmarkedUsers.contains(userId)) {
@@ -49,6 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
       } else {
         _bookmarkedUsers.add(userId);
       }
+      _saveBookmarks();
     });
   }
 
@@ -58,20 +144,19 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text('StackOverflow Users'),
       ),
-      body: FutureBuilder<UserResponse>(
-        future: _userResponse,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            final users = snapshot.data!.items;
-            return ListView.builder(
-              itemCount: users.length,
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: _users.length + (_hasMore ? 1 : 0),
               itemBuilder: (context, index) {
-                final user = users[index];
-                final isBookmarked = _bookmarkedUsers.contains(user.user_id); // Kiểm tra người dùng có được đánh dấu không
+                if (index == _users.length) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final user = _users[index];
+                final isBookmarked = _bookmarkedUsers.contains(user.user_id);
 
                 return InkWell(
                   onTap: () {
@@ -97,8 +182,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         Text('Reputation: ${user.reputation}'),
                         if (user.location != null && user.location!.isNotEmpty)
                           Text('Location: ${user.location}'),
-                        if (user.reputation_change_year != null)
-                          Text('Reputation Change Year: ${user.reputation_change_year}'),
                       ],
                     ),
                     trailing: IconButton(
@@ -107,17 +190,19 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: isBookmarked ? Colors.blue : null,
                       ),
                       onPressed: () {
-                        _toggleBookmark(user.user_id); // Đánh dấu hoặc bỏ đánh dấu
+                        _toggleBookmark(user.user_id);
                       },
                     ),
                   ),
                 );
               },
-            );
-          } else {
-            return const Center(child: Text('No data available'));
-          }
-        },
+            ),
+          ),
+          if (_isLoading && _users.isEmpty)
+            const Center(
+              child: CircularProgressIndicator(),
+            ),
+        ],
       ),
     );
   }
