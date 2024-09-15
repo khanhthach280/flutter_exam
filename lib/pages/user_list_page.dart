@@ -115,27 +115,13 @@ class _UserListPageState extends State<UserListPage> {
     prefs.setStringList('bookmarkedUsers', bookmarkedUsersJson);
   }
 
-  // Chuyển đối tượng User thành chuỗi JSON
   String userToJson(User user) {
-    return json.encode({
-      'user_id': user.user_id,
-      'display_name': user.display_name,
-      'profile_image': user.profile_image,
-      'reputation': user.reputation,
-      'location': user.location ?? '',
-    });
+    return json.encode(user.toJson());
   }
 
   // Chuyển chuỗi JSON thành đối tượng User
   User userFromJson(String jsonString) {
-    final jsonData = json.decode(jsonString);
-    return User(
-      user_id: jsonData['user_id'],
-      display_name: jsonData['display_name'],
-      profile_image: jsonData['profile_image'],
-      reputation: jsonData['reputation'],
-      location: jsonData['location'],
-    );
+    return User.fromJson(json.decode(jsonString));
   }
 
   // Thêm hoặc xóa user khỏi danh sách bookmark
@@ -179,7 +165,8 @@ class _UserListPageState extends State<UserListPage> {
                     controller: _scrollController,
                     itemCount:
                         (_showBookmarkedOnly ? _bookmarkedUserObjects : _users)
-                            .length + (_hasMore && !_showBookmarkedOnly ? 1 : 0),
+                                .length +
+                            (_hasMore && !_showBookmarkedOnly ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (!_showBookmarkedOnly && index == _users.length) {
                         return const Center(child: CircularProgressIndicator());
