@@ -55,7 +55,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
       final response = await UserRepository().fetchUserReputationHistory(
         userId: widget.userId,
         page: _page,
-        pageSize: 10,
+        pageSize: 30,
       );
       setState(() {
         _reputationHistory = response.items;
@@ -82,7 +82,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
       final response = await UserRepository().fetchUserReputationHistory(
         userId: widget.userId,
         page: _page + 1,
-        pageSize: 10,
+        pageSize: 30,
       );
       setState(() {
         _reputationHistory = List.from(_reputationHistory)
